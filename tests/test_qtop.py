@@ -59,6 +59,28 @@ def config():
     return {}
 
 
+@pytest.mark.parametrize(
+    "options, expected",
+    (
+        (["cluster_name=pool=a=b"], "pool=a=b"),
+        (["cluster_name="], ""),
+        (["cluster_name=first", "cluster_name=second=value"], "second=value"),
+        (["cluster_name='quoted=value'"], "quoted=value"),
+        (["cluster_name=42"], 42),
+    ),
+)
+def test_config_overrides_preserve_values_and_last_override_wins(monkeypatch, options, expected):
+    argv = ["qtop"]
+    for option in options:
+        argv.extend(["-o", option])
+    monkeypatch.setattr(sys, "argv", argv)
+    args = qtop_utils.parse_qtop_cmdline_args()
+
+    config = qtop_module.update_config_with_cmdline_vars(args, {"rem_empty_corelines": "0"})
+
+    assert config["cluster_name"] == expected
+
+
 def test_sort_worker_nodes_uses_named_sort_keys(monkeypatch):
     import qtop_py.qtop as qtop
 
