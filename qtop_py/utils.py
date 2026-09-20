@@ -129,7 +129,7 @@ def parse_qtop_cmdline_args():
         default=False,
         help="Don't mask early empty WNs (default: if the first 30 WNs are unused, counting starts from 31).",
     )
-    parser.add_argument("-o", "--option", action="append", dest="OPTION", default=[], help="Override respective option in QTOPCONF_YAML file")
+    parser.add_argument("-o", "--option", action="append", dest="OPTION", default=[], metavar="KEY=VALUE", help="Override respective option in QTOPCONF_YAML file")
     parser.add_argument("-O", "--onlysavetofile", action="store_true", dest="ONLYSAVETOFILE", default=False, help="Do not print results to stdout")
     parser.add_argument(
         "-r",
@@ -189,6 +189,10 @@ def parse_qtop_cmdline_args():
     # parser.add_argument("-f", "--setCOLORMAPFILE", action="store", dest="COLORFILE")  # TODO
 
     args = parser.parse_args()
+    for option in args.OPTION:
+        key, separator, _ = option.partition("=")
+        if not separator or not key.strip():
+            parser.error("argument -o/--option: expected KEY=VALUE with a non-empty key")
     return args
 
 
