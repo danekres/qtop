@@ -68,3 +68,15 @@ def test_no_scheduler_message_is_not_duplicated(tmp_path, module):
     assert result.returncode == 1
     assert output.count("No suitable scheduler was found") == 1
     assert "Traceback" not in output
+
+
+@pytest.mark.parametrize("module", ("qtop_py.cli", "qtop_py.qtop"))
+@pytest.mark.parametrize("flag", ("-o", "--option"))
+@pytest.mark.parametrize("option", ("scheduler", "", "=demo", "   =demo"))
+def test_malformed_config_overrides_are_usage_errors(tmp_path, module, flag, option):
+    result = run_cli(tmp_path, module, flag, option)
+
+    assert result.returncode == 2
+    assert "-o/--option" in result.stderr
+    assert "KEY=VALUE" in result.stderr
+    assert "Traceback" not in result.stdout + result.stderr
