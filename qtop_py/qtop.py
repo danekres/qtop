@@ -496,7 +496,7 @@ def get_input_filenames(INPUT_FNs_commands, config):
 
 
 def get_key_val_from_option_string(string):
-    key, val = string.split("=")
+    key, val = string.split("=", 1)
     return key, val
 
 
